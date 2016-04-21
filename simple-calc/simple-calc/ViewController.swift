@@ -108,6 +108,7 @@ class ViewController: UIViewController {
         textBoxString += String(count)
     }
     
+
     func average() {
         var sum = 0
         var count = 0
@@ -123,11 +124,13 @@ class ViewController: UIViewController {
     
     func factorial() {
         let number = Int(intlist[0])
-        var factorial = 1
-        for int in 1...number {
-            factorial *= int
+        var current = 1
+        var total = 1
+        while current < number {
+            total *= current
+            current += 1
         }
-        textBoxString += String(factorial)
+        textBoxString += String(total)
     }
     
     @IBAction func button0(sender: UIButton) {
