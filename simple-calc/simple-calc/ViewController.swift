@@ -24,6 +24,7 @@ class ViewController: UIViewController {
     var intlist = [String]()
     var textBoxString = ""
     var refresh = false
+    var rpn = false
 
     @IBOutlet weak var textBox: UITextField!
     
@@ -36,17 +37,30 @@ class ViewController: UIViewController {
     }
     
     func cleanup() {
-        for x in 0...intlist.count-1 {
-            intlist[x] = ""
+        if(intlist.count > 0) {
+            for x in 0...intlist.count-1 {
+                intlist[x] = ""
+            }
+            pointer = 0
+            refresh = true
         }
-        pointer = 0
-        refresh = true
     }
     
     func addition() {
         if (pointer == 2) {
             let num1 = Int(intlist[0])
             let num2 = Int(intlist[2])
+            let sum = num1! + num2!
+            textBoxString += String(sum)
+        } else {
+            textBoxString = "Invalid Operation"
+        }
+    }
+    
+    func additionrpn() {
+        if (pointer == 2) {
+            let num1 = Int(intlist[0])
+            let num2 = Int(intlist[1])
             let sum = num1! + num2!
             textBoxString += String(sum)
         } else {
@@ -65,10 +79,32 @@ class ViewController: UIViewController {
         }
     }
     
+    func subtractionrpn() {
+        if (pointer == 2) {
+            let num1 = Int(intlist[0])
+            let num2 = Int(intlist[1])
+            let num3 = num1! - num2!
+            textBoxString += String(num3)
+        } else {
+            textBoxString = "Invalid Operation"
+        }
+    }
+    
     func multiplication() {
         if (pointer == 2) {
             let num1 = Int(intlist[0])
             let num2 = Int(intlist[2])
+            let product = num1! * num2!
+            textBoxString += String(product)
+        } else {
+            textBoxString = "Invalid Operation"
+        }
+    }
+    
+    func multiplicationrpn() {
+        if (pointer == 2) {
+            let num1 = Int(intlist[0])
+            let num2 = Int(intlist[1])
             let product = num1! * num2!
             textBoxString += String(product)
         } else {
@@ -87,10 +123,32 @@ class ViewController: UIViewController {
         }
     }
     
+    func divisionrpn() {
+        if (pointer == 2) {
+            let num1 = Int(intlist[0])
+            let num2 = Int(intlist[1])
+            let num3 = Double(num1!) / Double(num2!)
+            textBoxString += String(num3)
+        } else {
+            textBoxString = "Invalid Operation"
+        }
+    }
+    
     func mod() {
         if (pointer == 2) {
             let num1 = Int(intlist[0])
             let num2 = Int(intlist[2])
+            let mod = num1! % num2!
+            textBoxString += String(mod)
+        } else {
+            textBoxString = "Invalid Operation"
+        }
+    }
+    
+    func modrpn(){
+        if (pointer == 2) {
+            let num1 = Int(intlist[0])
+            let num2 = Int(intlist[1])
             let mod = num1! % num2!
             textBoxString += String(mod)
         } else {
@@ -116,6 +174,7 @@ class ViewController: UIViewController {
             if string != "avg" && string != "" {
                 sum += Int(string)!
                 count += 1
+                NSLog("\(sum) \(count)")
             }
         }
         let avg = Double(sum) / Double(count)
@@ -286,8 +345,27 @@ class ViewController: UIViewController {
         textBoxString += " = "
         textBox.text = textBoxString
         NSLog("= was pressed!")
-        let oper = intlist[1]
-        if(pointer == 2) {
+        if(rpn) {
+            let oper = intlist[pointer]
+            if oper == "+" {
+                additionrpn()
+            } else if oper == "-" {
+                subtractionrpn()
+            } else if oper == "*" {
+                multiplicationrpn()
+            } else if oper == "/" {
+                divisionrpn()
+            } else if oper == "%" {
+                modrpn()
+            } else if oper == "count" {
+                counter()
+            } else if oper == "avg" {
+                average()
+            } else if oper == "fact" && pointer == 1 {
+                factorial()
+            }
+        } else {
+            let oper = intlist[1]
             if (oper == "+" || oper == "-" || oper == "*" || oper == "/" || oper == "%") {
                 if oper == "+" {
                     addition()
@@ -300,13 +378,13 @@ class ViewController: UIViewController {
                 } else if oper == "%" {
                     mod()
                 }
+            } else if oper == "count" {
+                counter()
+            } else if oper == "avg" {
+                average()
+            } else if oper == "fact" && pointer == 1 {
+                factorial()
             }
-        } else if oper == "count" {
-            counter()
-        } else if oper == "avg" {
-            average()
-        } else if oper == "fact" && pointer == 1 {
-            factorial()
         }
         textBox.text = textBoxString
         
@@ -315,12 +393,20 @@ class ViewController: UIViewController {
     
     @IBAction func buttonplus(sender: UIButton) {
         pointer += 1
-        if(intlist.count > pointer) {
-            intlist[pointer] = "+"
-            pointer += 1
+        if(rpn) {
+            if(intlist.count > pointer) {
+                intlist[pointer] = "+"
+            } else {
+                self.intlist.append("+")
+            }
         } else {
-            self.intlist.append("+")
-            pointer += 1
+            if(intlist.count > pointer) {
+                intlist[pointer] = "+"
+                pointer += 1
+            } else {
+                self.intlist.append("+")
+                pointer += 1
+            }
         }
         textBoxString += " + "
         textBox.text = textBoxString
@@ -329,12 +415,20 @@ class ViewController: UIViewController {
     
     @IBAction func buttonminus(sender: UIButton) {
         pointer += 1
-        if(intlist.count > pointer) {
-            intlist[pointer] = "-"
-            pointer += 1
+        if(rpn){
+            if(intlist.count > pointer) {
+                intlist[pointer] = "-"
+            } else {
+                self.intlist.append("-")
+            }
         } else {
-            self.intlist.append("-")
-            pointer += 1
+            if(intlist.count > pointer) {
+                intlist[pointer] = "-"
+                pointer += 1
+            } else {
+                self.intlist.append("-")
+                pointer += 1
+            }
         }
         textBoxString += " - "
         textBox.text = textBoxString
@@ -343,12 +437,20 @@ class ViewController: UIViewController {
     
     @IBAction func buttonmultiply(sender: UIButton) {
         pointer += 1
-        if(intlist.count > pointer) {
-            intlist[pointer] = "*"
-            pointer += 1
+        if(rpn){
+            if(intlist.count > pointer) {
+                intlist[pointer] = "*"
+            } else {
+                self.intlist.append("*")
+            }
         } else {
-            self.intlist.append("*")
-            pointer += 1
+            if(intlist.count > pointer) {
+                intlist[pointer] = "*"
+                pointer += 1
+            } else {
+                self.intlist.append("*")
+                pointer += 1
+            }
         }
         textBoxString += " * "
         textBox.text = textBoxString
@@ -357,12 +459,20 @@ class ViewController: UIViewController {
     
     @IBAction func buttondivide(sender: UIButton) {
         pointer += 1
-        if(intlist.count > pointer) {
-            intlist[pointer] = "/"
-            pointer += 1
+        if(rpn) {
+            if(intlist.count > pointer) {
+                intlist[pointer] = "/"
+            } else {
+                self.intlist.append("/")
+            }
         } else {
-            self.intlist.append("/")
-            pointer += 1
+            if(intlist.count > pointer) {
+                intlist[pointer] = "/"
+                pointer += 1
+            } else {
+                self.intlist.append("/")
+                pointer += 1
+            }
         }
         textBoxString += " / "
         textBox.text = textBoxString
@@ -371,12 +481,20 @@ class ViewController: UIViewController {
     
     @IBAction func buttonmod(sender: UIButton) {
         pointer += 1
-        if(intlist.count > pointer) {
-            intlist[pointer] = "%"
-            pointer += 1
+        if(rpn){
+            if(intlist.count > pointer) {
+                intlist[pointer] = "%"
+            } else {
+                self.intlist.append("%")
+            }
         } else {
-            self.intlist.append("%")
-            pointer += 1
+            if(intlist.count > pointer) {
+                intlist[pointer] = "%"
+                pointer += 1
+            } else {
+                self.intlist.append("%")
+                pointer += 1
+            }
         }
         textBoxString += " % "
         textBox.text = textBoxString
@@ -385,12 +503,20 @@ class ViewController: UIViewController {
     
     @IBAction func buttoncount(sender: UIButton) {
         pointer += 1
-        if(intlist.count > pointer) {
-            intlist[pointer] = "count"
-            pointer += 1
+        if(rpn) {
+            if(intlist.count > pointer) {
+                intlist[pointer] = "count"
+            } else {
+                self.intlist.append("count")
+            }
         } else {
-            self.intlist.append("count")
-            pointer += 1
+            if(intlist.count > pointer) {
+                intlist[pointer] = "count"
+                pointer += 1
+            } else {
+                self.intlist.append("count")
+                pointer += 1
+            }
         }
         textBoxString += " count "
         textBox.text = textBoxString
@@ -399,12 +525,20 @@ class ViewController: UIViewController {
     
     @IBAction func buttonavg(sender: UIButton) {
         pointer += 1
-        if(intlist.count > pointer) {
-            intlist[pointer] = "avg"
-            pointer += 1
+        if(rpn) {
+            if(intlist.count > pointer) {
+                intlist[pointer] = "avg"
+            } else {
+                self.intlist.append("avg")
+            }
         } else {
-            self.intlist.append("avg")
-            pointer += 1
+            if(intlist.count > pointer) {
+                intlist[pointer] = "avg"
+                pointer += 1
+            } else {
+                self.intlist.append("avg")
+                pointer += 1
+            }
         }
         textBoxString += " avg "
         textBox.text = textBoxString
@@ -423,5 +557,18 @@ class ViewController: UIViewController {
         NSLog("fact was pressed!")
     }
     
+    @IBAction func buttonswitch(sender: UISwitch) {
+        rpn = !rpn
+        cleanup()
+    }
+    
+    @IBAction func buttonNext(sender: UIButton) {
+        if(rpn) {
+            pointer += 1
+            textBoxString += " "
+            textBox.text = textBoxString
+            NSLog("next was pressed!")
+        }
+    }
 }
 
