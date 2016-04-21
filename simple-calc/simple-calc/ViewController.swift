@@ -126,7 +126,7 @@ class ViewController: UIViewController {
         let number = Int(intlist[0])
         var current = 1
         var total = 1
-        while current < number {
+        while current <= number {
             total *= current
             current += 1
         }
